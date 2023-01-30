@@ -29,6 +29,8 @@ func Cmd() console.CommandGetter {
 			mainFiles, err := files.Detect("main.go")
 			console.FatalIfErr(err, "detect main.go")
 
+			aarch64 := files.Exist("/usr/bin/aarch64-linux-gnu-gcc")
+
 			for _, main := range mainFiles {
 				appName := files.Folder(main)
 				archList := strings.Split(arch, ",")
@@ -38,9 +40,13 @@ func Cmd() console.CommandGetter {
 
 					switch arch {
 					case "arm64":
-						cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+						if aarch64 {
+							cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+						} else {
+							cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+						}
 					case "amd64":
-						cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+						cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
 					default:
 						console.Fatalf("use only arch=[amd64,arm64]")
 					}

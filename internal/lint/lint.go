@@ -27,7 +27,7 @@ func Cmd() console.CommandGetter {
 			console.FatalIfErr(err, "detect main.go")
 
 			for _, main := range mainFiles {
-				exec.CommandPack("bash", "go build -race -v -o /tmp/bin.test "+main)
+				exec.CommandPack("bash", "go build -a -race -o /tmp/bin.test "+main)
 			}
 		})
 	})

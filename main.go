@@ -30,7 +30,8 @@ func main() {
 	}))
 
 	app.AddCommand(
-		setup.Cmd(),
+		setup.CmdApp(),
+		setup.CmdLib(),
 		lint.Cmd(),
 		tests.Cmd(),
 		build.Cmd(),

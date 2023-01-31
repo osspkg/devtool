@@ -10,28 +10,22 @@ import (
 	"github.com/deweppro/go-app/console"
 )
 
-func Cmd() console.CommandGetter {
+func CmdLib() console.CommandGetter {
 	return console.NewCommand(func(setter console.CommandSetter) {
-		setter.Setup("setup", "")
+		setter.Setup("setup-lib", "")
 		setter.ExecFunc(func(_ []string) {
 			global.SetupEnv()
 
-			toolDir, initDir, scriptsDir := global.GetToolsDir(), global.GetInitDir(), global.GetScriptsDir()
-
-			console.FatalIfErr(os.MkdirAll(initDir, 0755), "create init dir")
+			toolDir := global.GetToolsDir()
 			console.FatalIfErr(os.MkdirAll(toolDir, 0755), "create tools dir")
-			console.FatalIfErr(os.MkdirAll(scriptsDir, 0755), "create scripts dir")
 
 			console.Infof("update .gitignore")
 			console.FatalIfErr(files.Rewrite(files.CurrentDir()+"/.gitignore", func(s string) string {
 				if !strings.Contains(s, global.ToolsDir) {
 					s += global.ToolsDir + "/\n"
 				}
-				if !strings.Contains(s, global.BuildDir) {
-					s += global.BuildDir + "/\n"
-				}
 				return s
-			}), "create tools dir")
+			}), "update .gitignore")
 
 			console.Infof("install tools")
 			for name, install := range tools1 {
@@ -50,12 +44,34 @@ func Cmd() console.CommandGetter {
 				}
 			}
 
-			console.Infof("create configs")
-			for name, config := range configs {
+			console.Infof("create ci/cd configs")
+			for name, config := range cicdConfigs {
 				if !files.Exist(files.CurrentDir() + "/" + name) {
 					console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0755), "create config [%s]", name)
 				}
 			}
+		})
+	})
+}
+
+func CmdApp() console.CommandGetter {
+	return console.NewCommand(func(setter console.CommandSetter) {
+		setter.Setup("setup-app", "")
+		setter.ExecFunc(func(_ []string) {
+			global.SetupEnv()
+
+			initDir, scriptsDir := global.GetInitDir(), global.GetScriptsDir()
+
+			console.FatalIfErr(os.MkdirAll(initDir, 0755), "create init dir")
+			console.FatalIfErr(os.MkdirAll(scriptsDir, 0755), "create scripts dir")
+
+			console.Infof("update .gitignore")
+			console.FatalIfErr(files.Rewrite(files.CurrentDir()+"/.gitignore", func(s string) string {
+				if !strings.Contains(s, global.BuildDir) {
+					s += global.BuildDir + "/\n"
+				}
+				return s
+			}), "update .gitignore")
 
 			console.Infof("create services and deb scripts")
 			postinstData, postrmData, preinstData, prermData := bashPrefix, bashPrefix, bashPrefix, bashPrefix
@@ -100,18 +116,19 @@ var tools1 = map[string]string{
 
 var tools2 = map[string]map[string]string{
 	"go1.19": {
-		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.0",
+		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1",
 	},
 	"go1.18": {
-		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0",
+		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.47.3",
 	},
 	"go1.17": {
-		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.38.0",
+		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.44.2",
 	},
 }
 
-var configs = map[string]string{
+var cicdConfigs = map[string]string{
 	".golangci.yml": golangciLintConfig,
+	"Makefile":      makefileConfig,
 }
 
 var golangciLintConfig = `
@@ -146,7 +163,7 @@ linters-settings:
   misspell:
     locale: US
   gosimple:
-    go: "1.16"
+    go: "1.17"
     checks: ["all"]
   prealloc:
     simple: true
@@ -168,6 +185,36 @@ linters:
   fast: false
 
 `
+
+var makefileConfig = `
+.PHONY: install
+install:
+	go install github.com/dewep-online/devtool
+
+.PHONY: setup
+setup:
+	devtool setup-lib
+
+.PHONY: lint
+lint:
+	devtool lint
+
+.PHONY: build
+build:
+	devtool build
+
+.PHONY: tests
+tests:
+	devtool test
+
+.PHONY: pre-commite
+pre-commite: setup lint build tests
+
+.PHONY: ci
+ci: install setup lint build tests
+
+`
+
 var systemctlConfig = `[Unit]
 After=network.target
 

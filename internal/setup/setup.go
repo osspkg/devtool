@@ -2,6 +2,7 @@ package setup
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/dewep-online/devtool/internal/global"
@@ -46,9 +47,13 @@ func CmdLib() console.CommandGetter {
 
 			console.Infof("create ci/cd configs")
 			for name, config := range cicdConfigs {
-				if !files.Exist(files.CurrentDir() + "/" + name) {
-					console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0755), "create config [%s]", name)
+				if files.Exist(files.CurrentDir() + "/" + name) {
+					continue
 				}
+				if strings.Contains(name, "/") {
+					console.FatalIfErr(os.MkdirAll(files.CurrentDir()+"/"+filepath.Dir(name), 0755), "create dir for [%s]", name)
+				}
+				console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0755), "create config [%s]", name)
 			}
 		})
 	})
@@ -127,8 +132,9 @@ var tools2 = map[string]map[string]string{
 }
 
 var cicdConfigs = map[string]string{
-	".golangci.yml": golangciLintConfig,
-	"Makefile":      makefileConfig,
+	".golangci.yml":            golangciLintConfig,
+	"Makefile":                 makefileConfig,
+	".github/workflows/ci.yml": githubCiConfig,
 }
 
 var golangciLintConfig = `
@@ -189,7 +195,7 @@ linters:
 var makefileConfig = `
 .PHONY: install
 install:
-	go install github.com/dewep-online/devtool
+	go install github.com/dewep-online/devtool@latest
 
 .PHONY: setup
 setup:
@@ -261,3 +267,32 @@ if [ -f "/etc/systemd/system/{%app_name%}.service" ]; then
 fi
 `
 )
+
+var githubCiConfig = `
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.17', '1.18', '1.19' ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Run CI
+        env:
+          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+        run: make ci
+`

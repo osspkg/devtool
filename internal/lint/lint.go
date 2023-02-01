@@ -12,15 +12,14 @@ func Cmd() console.CommandGetter {
 		setter.Setup("lint", "")
 		setter.ExecFunc(func(_ []string) {
 			console.Infof("setup tools")
-			toolsDir := global.GetToolsDir()
 			global.SetupEnv()
 
 			exec.CommandPack("bash",
 				"go mod tidy",
 				"go mod download",
 				"go generate ./...",
-				toolsDir+"/golangci-lint --version",
-				toolsDir+"/golangci-lint -v run ./...",
+				"golangci-lint --version",
+				"golangci-lint -v run ./...",
 			)
 
 			mainFiles, err := files.Detect("main.go")

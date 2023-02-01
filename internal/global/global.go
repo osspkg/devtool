@@ -34,6 +34,7 @@ func GetScriptsDir() string {
 
 func SetupEnv() {
 	console.FatalIfErr(os.Setenv("GOBIN", GetToolsDir()), "setup env")
+	console.FatalIfErr(os.Setenv("PATH", GetToolsDir()+":"+os.Getenv("PATH")), "setup env")
 }
 
 var rex = regexp.MustCompile(`go(\d+)\.(\d+)`)

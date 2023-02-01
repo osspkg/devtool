@@ -207,7 +207,7 @@ lint:
 
 .PHONY: build
 build:
-	devtool build
+	devtool build --arch=amd64
 
 .PHONY: tests
 tests:

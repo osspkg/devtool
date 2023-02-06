@@ -6,7 +6,7 @@ import (
 	"github.com/dewep-online/devtool/internal/global"
 	"github.com/dewep-online/devtool/pkg/exec"
 	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-app/console"
+	"github.com/deweppro/go-sdk/console"
 )
 
 func Cmd() console.CommandGetter {
@@ -16,44 +16,53 @@ func Cmd() console.CommandGetter {
 			flagsSetter.StringVar("arch", "amd64,arm64", "")
 		})
 		setter.ExecFunc(func(_ []string, arch string) {
-			console.Infof("setup tools")
-			buildDir := global.GetBuildDir()
 			global.SetupEnv()
+			console.Infof("--- BUILD ---")
 
-			cmds := []string{
-				"go mod tidy",
-				"go mod download",
-				"go generate ./...",
-			}
+			pack := make([]string, 0)
+			buildDir := global.GetBuildDir()
 
 			mainFiles, err := files.Detect("main.go")
 			console.FatalIfErr(err, "detect main.go")
-
-			aarch64 := files.Exist("/usr/bin/aarch64-linux-gnu-gcc")
 
 			for _, main := range mainFiles {
 				appName := files.Folder(main)
 				archList := strings.Split(arch, ",")
 
 				for _, arch = range archList {
-					cmds = append(cmds, "rm -rf "+buildDir+"/"+appName+"_"+arch)
+					pack = append(pack, "rm -rf "+buildDir+"/"+appName+"_"+arch)
+
+					chunk := []string{
+						"GODEBUG=netdns=9",
+						"GO111MODULE=on",
+						"CGO_ENABLED=1",
+					}
 
 					switch arch {
 					case "arm64":
-						if aarch64 {
-							cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
-						} else {
-							cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+						chunk = append(chunk, "GOOS=linux", "GOARCH=arm64")
+
+						if exist("/usr/bin/aarch64-linux-gnu-gcc") {
+							chunk = append(chunk, "CC=aarch64-linux-gnu-gcc")
 						}
+
 					case "amd64":
-						cmds = append(cmds, "GODEBUG=netdns=9 GO111MODULE=on CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+						chunk = append(chunk, "GOOS=linux", "GOARCH=amd64")
+
 					default:
 						console.Fatalf("use only arch=[amd64,arm64]")
 					}
+
+					chunk = append(chunk, "go build -ldflags=\"-s -w\" -a -o "+buildDir+"/"+appName+"_"+arch+" "+main)
+					pack = append(pack, strings.Join(chunk, " "))
 				}
 			}
 
-			exec.CommandPack("bash", cmds...)
+			exec.CommandPack("bash", pack...)
 		})
 	})
+}
+
+func exist(filename string) bool {
+	return files.Exist(filename)
 }

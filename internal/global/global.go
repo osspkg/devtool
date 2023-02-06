@@ -2,11 +2,11 @@ package global
 
 import (
 	"os"
-	exec2 "os/exec"
+	"os/exec"
 	"regexp"
 
 	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-app/console"
+	"github.com/deweppro/go-sdk/console"
 )
 
 const (
@@ -40,7 +40,7 @@ func SetupEnv() {
 var rex = regexp.MustCompile(`go(\d+)\.(\d+)`)
 
 func GoVersion() string {
-	b, err := exec2.Command("bash", "-c", "go version").CombinedOutput()
+	b, err := exec.Command("bash", "-c", "go version").CombinedOutput()
 	console.FatalIfErr(err, "detect go version")
 	result := rex.FindAllString(string(b), 1)
 	for _, s := range result {

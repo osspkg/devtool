@@ -3,14 +3,13 @@ package exec
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"sync"
 
 	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-app/application/sys"
-	"github.com/deweppro/go-app/console"
+	"github.com/deweppro/go-sdk/console"
+	"github.com/deweppro/go-sdk/syscall"
 )
 
 func CommandPack(shell string, command ...string) {
@@ -22,7 +21,7 @@ func CommandPack(shell string, command ...string) {
 func Command(shell string, command string) (err error) {
 	wg := sync.WaitGroup{}
 	ctx, cncl := context.WithCancel(context.Background())
-	go sys.OnSyscallStop(func() {
+	go syscall.OnStop(func() {
 		cncl()
 	})
 
@@ -54,7 +53,7 @@ func runCmd(ctx context.Context, shell string, command string) error {
 	go func() {
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
-			fmt.Println(scanner.Text())
+			console.Rawf(scanner.Text())
 			select {
 			case <-ctx.Done():
 				break
@@ -65,7 +64,7 @@ func runCmd(ctx context.Context, shell string, command string) error {
 	go func() {
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
-			fmt.Println(scanner.Text())
+			console.Rawf(scanner.Text())
 			select {
 			case <-ctx.Done():
 				break

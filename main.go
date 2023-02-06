@@ -8,7 +8,7 @@ import (
 	"github.com/dewep-online/devtool/internal/lint"
 	"github.com/dewep-online/devtool/internal/setup"
 	"github.com/dewep-online/devtool/internal/tests"
-	"github.com/deweppro/go-app/console"
+	"github.com/deweppro/go-sdk/console"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	app.RootCommand(console.NewCommand(func(setter console.CommandSetter) {
 		setter.ExecFunc(func(_ []string) {
 			global.SetupEnv()
-			console.Infof("os env:\n%s", func() string {
+			console.Rawf("os env:\n%s", func() string {
 				out := ""
 				for _, s := range os.Environ() {
 					out += s + "\n"

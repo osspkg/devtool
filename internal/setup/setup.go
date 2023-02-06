@@ -8,7 +8,7 @@ import (
 	"github.com/dewep-online/devtool/internal/global"
 	"github.com/dewep-online/devtool/pkg/exec"
 	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-app/console"
+	"github.com/deweppro/go-sdk/console"
 )
 
 func CmdLib() console.CommandGetter {
@@ -16,6 +16,7 @@ func CmdLib() console.CommandGetter {
 		setter.Setup("setup-lib", "")
 		setter.ExecFunc(func(_ []string) {
 			global.SetupEnv()
+			console.Infof("--- SETUP ENV ---")
 
 			toolDir := global.GetToolsDir()
 			console.FatalIfErr(os.MkdirAll(toolDir, 0755), "create tools dir")
@@ -55,6 +56,12 @@ func CmdLib() console.CommandGetter {
 				}
 				console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0755), "create config [%s]", name)
 			}
+
+			exec.CommandPack("bash",
+				"go mod tidy",
+				"go mod download",
+				"go generate ./...",
+			)
 		})
 	})
 }
@@ -64,6 +71,7 @@ func CmdApp() console.CommandGetter {
 		setter.Setup("setup-app", "")
 		setter.ExecFunc(func(_ []string) {
 			global.SetupEnv()
+			console.Infof("--- SETUP APP ---")
 
 			initDir, scriptsDir := global.GetInitDir(), global.GetScriptsDir()
 

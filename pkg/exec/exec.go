@@ -56,7 +56,7 @@ func runCmd(ctx context.Context, shell string, command string) error {
 			console.Rawf(scanner.Text())
 			select {
 			case <-ctx.Done():
-				break
+				return
 			default:
 			}
 		}
@@ -67,7 +67,7 @@ func runCmd(ctx context.Context, shell string, command string) error {
 			console.Rawf(scanner.Text())
 			select {
 			case <-ctx.Done():
-				break
+				return
 			default:
 			}
 		}

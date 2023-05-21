@@ -1,4 +1,5 @@
 TOOLS_BIN=$(shell pwd)/.tools
+GO_PATH=$(shell go env GOPATH)
 
 .PHONY: install
 install:
@@ -8,7 +9,7 @@ install:
 .PHONY: install_local
 install_local:
 	@go mod download && \
-		GO111MODULE=on GODEBUG=netdns=9 CGO_ENABLED=1  go build -ldflags="-s -w" -a -o ~/.local/bin/devtool
+		GO111MODULE=on GODEBUG=netdns=9 CGO_ENABLED=1  go build -ldflags="-s -w" -a -o $(GO_PATH)/bin/devtool
 
 .PHONY: setup
 setup:
@@ -26,6 +27,10 @@ build:
 tests:
 	@$(TOOLS_BIN)/devtool test
 
+.PHONY: clean
+clean:
+	@rm -rf $(TOOLS_BIN)
+
 .PHONY: ci
-ci: install setup lint build tests
+ci: clean install setup lint build tests
 

@@ -37,6 +37,7 @@ func CmdLib() console.CommandGetter {
 			}
 
 			gover := global.GoVersion()
+			console.Infof("go version: %s", gover)
 			tools, ok := tools2[gover]
 			if ok {
 				for name, install := range tools {
@@ -130,6 +131,9 @@ var tools1 = map[string]string{
 }
 
 var tools2 = map[string]map[string]string{
+	"go1.20": {
+		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2",
+	},
 	"go1.19": {
 		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1",
 	},

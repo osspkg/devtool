@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/deweppro/go-sdk/console"
+	"github.com/osspkg/go-sdk/console"
 )
 
 func CurrentDir() string {
@@ -32,6 +32,11 @@ func Detect(filename string) ([]string, error) {
 }
 
 func Rewrite(filename string, cb func(string) string) error {
+	if !Exist(filename) {
+		if err := os.WriteFile(filename, []byte(""), 0755); err != nil {
+			return err
+		}
+	}
 	b, err := os.ReadFile(filename)
 	if err != nil {
 		return err

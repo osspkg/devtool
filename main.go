@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/dewep-online/devtool/internal/build"
-	"github.com/dewep-online/devtool/internal/global"
-	"github.com/dewep-online/devtool/internal/lint"
-	"github.com/dewep-online/devtool/internal/setup"
-	"github.com/dewep-online/devtool/internal/tests"
-	"github.com/deweppro/go-sdk/console"
+	"github.com/osspkg/devtool/internal/build"
+	"github.com/osspkg/devtool/internal/global"
+	"github.com/osspkg/devtool/internal/lint"
+	"github.com/osspkg/devtool/internal/setup"
+	"github.com/osspkg/devtool/internal/tests"
+	"github.com/osspkg/go-sdk/console"
 )
 
 func main() {

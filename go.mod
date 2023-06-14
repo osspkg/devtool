@@ -1,5 +1,5 @@
-module github.com/dewep-online/devtool
+module github.com/osspkg/devtool
 
 go 1.17
 
-require github.com/deweppro/go-sdk v1.2.3
+require github.com/osspkg/go-sdk v1.2.5

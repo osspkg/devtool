@@ -3,10 +3,10 @@ package build
 import (
 	"strings"
 
-	"github.com/dewep-online/devtool/internal/global"
-	"github.com/dewep-online/devtool/pkg/exec"
-	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-sdk/console"
+	"github.com/osspkg/devtool/internal/global"
+	"github.com/osspkg/devtool/pkg/exec"
+	"github.com/osspkg/devtool/pkg/files"
+	"github.com/osspkg/go-sdk/console"
 )
 
 func Cmd() console.CommandGetter {

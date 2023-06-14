@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2022-2023 Mikhail Knyzhev <markus621@yandex.ru>. All rights reserved.
+ *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
+ */
+
 package files
 
 import (
@@ -7,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/osspkg/go-sdk/console"
+	"gopkg.in/yaml.v3"
 )
 
 func CurrentDir() string {
@@ -23,6 +29,22 @@ func Detect(filename string) ([]string, error) {
 			return err
 		}
 		if info.IsDir() || info.Name() != filename {
+			return nil
+		}
+		files = append(files, path)
+		return nil
+	})
+	return files, err
+}
+
+func DetectByExt(ext string) ([]string, error) {
+	curDir := CurrentDir()
+	files := make([]string, 0)
+	err := filepath.Walk(curDir, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() || filepath.Ext(info.Name()) != ext {
 			return nil
 		}
 		files = append(files, path)
@@ -56,4 +78,20 @@ func Folder(filename string) string {
 	dir := filepath.Dir(filename)
 	tree := strings.Split(dir, string(os.PathSeparator))
 	return tree[len(tree)-1]
+}
+
+func YamlRead(filename string, v interface{}) error {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return yaml.Unmarshal(b, v)
+}
+
+func YamlWrite(filename string, v interface{}) error {
+	b, err := yaml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filename, b, 0755)
 }

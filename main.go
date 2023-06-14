@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2022-2023 Mikhail Knyzhev <markus621@yandex.ru>. All rights reserved.
+ *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
+ */
+
 package main
 
 import (
@@ -5,6 +10,7 @@ import (
 
 	"github.com/osspkg/devtool/internal/build"
 	"github.com/osspkg/devtool/internal/global"
+	"github.com/osspkg/devtool/internal/lic"
 	"github.com/osspkg/devtool/internal/lint"
 	"github.com/osspkg/devtool/internal/setup"
 	"github.com/osspkg/devtool/internal/tests"
@@ -35,6 +41,7 @@ func main() {
 		lint.Cmd(),
 		tests.Cmd(),
 		build.Cmd(),
+		lic.Cmd(),
 	)
 
 	app.Exec()

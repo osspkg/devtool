@@ -3,9 +3,9 @@ package tests
 import (
 	"os"
 
-	"github.com/dewep-online/devtool/internal/global"
-	"github.com/dewep-online/devtool/pkg/exec"
-	"github.com/deweppro/go-sdk/console"
+	"github.com/osspkg/devtool/internal/global"
+	"github.com/osspkg/devtool/pkg/exec"
+	"github.com/osspkg/go-sdk/console"
 )
 
 func Cmd() console.CommandGetter {

@@ -5,16 +5,19 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dewep-online/devtool/internal/global"
-	"github.com/dewep-online/devtool/pkg/exec"
-	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-sdk/console"
+	"github.com/osspkg/devtool/internal/global"
+	"github.com/osspkg/devtool/pkg/exec"
+	"github.com/osspkg/devtool/pkg/files"
+	"github.com/osspkg/go-sdk/console"
 )
 
 func CmdLib() console.CommandGetter {
 	return console.NewCommand(func(setter console.CommandSetter) {
 		setter.Setup("setup-lib", "")
-		setter.ExecFunc(func(_ []string) {
+		setter.Flag(func(flagsSetter console.FlagsSetter) {
+			flagsSetter.Bool("force", "force update")
+		})
+		setter.ExecFunc(func(_ []string, force bool) {
 			global.SetupEnv()
 			console.Infof("--- SETUP ENV ---")
 
@@ -49,7 +52,7 @@ func CmdLib() console.CommandGetter {
 
 			console.Infof("create ci/cd configs")
 			for name, config := range cicdConfigs {
-				if files.Exist(files.CurrentDir() + "/" + name) {
+				if !force && files.Exist(files.CurrentDir()+"/"+name) {
 					continue
 				}
 				if strings.Contains(name, "/") {
@@ -70,7 +73,10 @@ func CmdLib() console.CommandGetter {
 func CmdApp() console.CommandGetter {
 	return console.NewCommand(func(setter console.CommandSetter) {
 		setter.Setup("setup-app", "")
-		setter.ExecFunc(func(_ []string) {
+		setter.Flag(func(flagsSetter console.FlagsSetter) {
+			flagsSetter.Bool("force", "force update")
+		})
+		setter.ExecFunc(func(_ []string, force bool) {
 			global.SetupEnv()
 			console.Infof("--- SETUP APP ---")
 
@@ -94,7 +100,7 @@ func CmdApp() console.CommandGetter {
 			console.FatalIfErr(err, "detect main.go")
 			for _, main := range mainFiles {
 				appName := files.Folder(main)
-				if !files.Exist(initDir + "/" + appName + ".service") {
+				if !files.Exist(initDir+"/"+appName+".service") || force {
 					tmpl := strings.ReplaceAll(systemctlConfig, "{%app_name%}", appName)
 					console.FatalIfErr(
 						os.WriteFile(initDir+"/"+appName+".service", []byte(tmpl), 0755),
@@ -107,16 +113,16 @@ func CmdApp() console.CommandGetter {
 				prermData += strings.ReplaceAll(prerm, "{%app_name%}", appName)
 			}
 
-			if !files.Exist(scriptsDir + "/postinst.sh") {
+			if !files.Exist(scriptsDir+"/postinst.sh") || force {
 				console.FatalIfErr(os.WriteFile(scriptsDir+"/postinst.sh", []byte(postinstData), 0755), "create postinst")
 			}
-			if !files.Exist(scriptsDir + "/postrm.sh") {
+			if !files.Exist(scriptsDir+"/postrm.sh") || force {
 				console.FatalIfErr(os.WriteFile(scriptsDir+"/postrm.sh", []byte(postrmData), 0755), "create postrm")
 			}
-			if !files.Exist(scriptsDir + "/preinst.sh") {
+			if !files.Exist(scriptsDir+"/preinst.sh") || force {
 				console.FatalIfErr(os.WriteFile(scriptsDir+"/preinst.sh", []byte(preinstData), 0755), "create preinst")
 			}
-			if !files.Exist(scriptsDir + "/prerm.sh") {
+			if !files.Exist(scriptsDir+"/prerm.sh") || force {
 				console.FatalIfErr(os.WriteFile(scriptsDir+"/prerm.sh", []byte(prermData), 0755), "create prerm")
 			}
 
@@ -126,7 +132,7 @@ func CmdApp() console.CommandGetter {
 
 var tools1 = map[string]string{
 	"goveralls": "go install github.com/mattn/goveralls@latest",
-	"static":    "go install github.com/deweppro/go-static/cmd/static@latest",
+	"static":    "go install github.com/osspkg/go-static/cmd/static@latest",
 	"easyjson":  "go install github.com/mailru/easyjson/...@latest",
 }
 
@@ -146,9 +152,11 @@ var tools2 = map[string]map[string]string{
 }
 
 var cicdConfigs = map[string]string{
-	".golangci.yml":            golangciLintConfig,
-	"Makefile":                 makefileConfig,
-	".github/workflows/ci.yml": githubCiConfig,
+	".golangci.yml":                golangciLintConfig,
+	"Makefile":                     makefileConfig,
+	".github/workflows/ci.yml":     githubCiConfig,
+	".github/workflows/codeql.yml": githubCodeQLConfig,
+	".github/dependabot.yml":       githubDependabotConfig,
 }
 
 var golangciLintConfig = `
@@ -531,7 +539,7 @@ linters:
 var makefileConfig = `
 .PHONY: install
 install:
-	go install github.com/dewep-online/devtool@latest
+	go install github.com/osspkg/devtool@latest
 
 .PHONY: setup
 setup:
@@ -631,4 +639,53 @@ jobs:
         env:
           COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
         run: make ci
+`
+
+var githubDependabotConfig = `
+version: 2
+updates:
+  - package-ecosystem: "gomod" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+`
+
+var githubCodeQLConfig = `
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '16 8 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'go' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
 `

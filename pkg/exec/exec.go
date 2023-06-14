@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/dewep-online/devtool/pkg/files"
-	"github.com/deweppro/go-sdk/console"
-	"github.com/deweppro/go-sdk/syscall"
+	"github.com/osspkg/devtool/pkg/files"
+	"github.com/osspkg/go-sdk/console"
+	"github.com/osspkg/go-sdk/syscall"
 )
 
 func CommandPack(shell string, command ...string) {

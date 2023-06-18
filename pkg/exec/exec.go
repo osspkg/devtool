@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2022-2023 Mikhail Knyzhev <markus621@yandex.ru>. All rights reserved.
+ *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
+ */
+
 package exec
 
 import (
@@ -33,6 +38,15 @@ func Command(shell string, command string) (err error) {
 
 	wg.Wait()
 	return
+}
+
+func SingleCmd(ctx context.Context, shell string, command string) ([]byte, error) {
+	console.Infof(command)
+	cmd := exec.CommandContext(ctx, shell, "-c", command)
+	cmd.Env = os.Environ()
+	cmd.Dir = files.CurrentDir()
+
+	return cmd.CombinedOutput()
 }
 
 func runCmd(ctx context.Context, shell string, command string) error {

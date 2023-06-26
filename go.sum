@@ -11,9 +11,9 @@ github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFF
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/mailru/easyjson v0.7.7/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
 github.com/mattn/go-sqlite3 v1.14.17/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
-github.com/osspkg/go-algorithms v1.2.3/go.mod h1:Zdclm/CKhDrUD34kIm9PL4VDbiey/jXAHY36nfc0r5Q=
-github.com/osspkg/go-sdk v1.2.6 h1:wdIGUB6M7J7C9l7Ln/q8638mSZjd8qB+pv2RKS+MtPE=
-github.com/osspkg/go-sdk v1.2.6/go.mod h1:nf6mgNnNMT0tEqrBc30rSRFvAJzP4Y4TKRaqq9iZu/Y=
+github.com/osspkg/go-algorithms v1.2.4/go.mod h1:Zdclm/CKhDrUD34kIm9PL4VDbiey/jXAHY36nfc0r5Q=
+github.com/osspkg/go-sdk v1.3.1 h1:enagDgm51ZKu4HP3qzvO4NHZhkvHuj1YY2o9hThAXc0=
+github.com/osspkg/go-sdk v1.3.1/go.mod h1:69hC0tZpAwBRjOxEpSJmo/c0b7KBhbG/BdmJ21t+Hv0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=

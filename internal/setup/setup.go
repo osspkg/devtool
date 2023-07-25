@@ -67,7 +67,7 @@ func CmdLib() console.CommandGetter {
 			}
 
 			exec.CommandPack("bash",
-				"go mod tidy",
+				"go mod tidy -compat=1.17",
 				"go mod download",
 				"go generate ./...",
 			)

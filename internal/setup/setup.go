@@ -137,13 +137,16 @@ func CmdApp() console.CommandGetter {
 
 var tools1 = map[string]string{
 	"goveralls": "go install github.com/mattn/goveralls@latest",
-	"static":    "go install github.com/osspkg/go-static/cmd/static@latest",
+	"static":    "go install go.osspkg.com/static/cmd/static@latest",
 	"easyjson":  "go install github.com/mailru/easyjson/...@latest",
 }
 
 var tools2 = map[string]map[string]string{
+	"go1.21": {
+		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.0",
+	},
 	"go1.20": {
-		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2",
+		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.0",
 	},
 	"go1.19": {
 		"golangci-lint": "go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.1",

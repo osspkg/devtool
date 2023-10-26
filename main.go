@@ -14,7 +14,7 @@ import (
 	"github.com/osspkg/devtool/internal/lint"
 	"github.com/osspkg/devtool/internal/setup"
 	"github.com/osspkg/devtool/internal/tests"
-	"github.com/osspkg/go-sdk/console"
+	"go.osspkg.com/goppy/sdk/console"
 )
 
 func main() {

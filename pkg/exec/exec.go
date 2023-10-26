@@ -13,8 +13,8 @@ import (
 	"sync"
 
 	"github.com/osspkg/devtool/pkg/files"
-	"github.com/osspkg/go-sdk/console"
-	"github.com/osspkg/go-sdk/syscall"
+	"go.osspkg.com/goppy/sdk/console"
+	"go.osspkg.com/goppy/sdk/syscall"
 )
 
 func CommandPack(shell string, command ...string) {

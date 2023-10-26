@@ -11,7 +11,7 @@ import (
 	"regexp"
 
 	"github.com/osspkg/devtool/pkg/files"
-	"github.com/osspkg/go-sdk/console"
+	"go.osspkg.com/goppy/sdk/console"
 )
 
 const (

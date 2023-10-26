@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/osspkg/go-sdk/console"
+	"go.osspkg.com/goppy/sdk/console"
 	"gopkg.in/yaml.v3"
 )
 

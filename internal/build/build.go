@@ -11,7 +11,7 @@ import (
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/pkg/exec"
 	"github.com/osspkg/devtool/pkg/files"
-	"github.com/osspkg/go-sdk/console"
+	"go.osspkg.com/goppy/sdk/console"
 )
 
 func Cmd() console.CommandGetter {

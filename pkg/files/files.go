@@ -22,7 +22,10 @@ func CurrentDir() string {
 }
 
 func Detect(filename string) ([]string, error) {
-	curDir := CurrentDir()
+	return DetectInDir(CurrentDir(), filename)
+}
+
+func DetectInDir(curDir, filename string) ([]string, error) {
 	files := make([]string, 0)
 	err := filepath.Walk(curDir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {

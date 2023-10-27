@@ -10,6 +10,7 @@ import (
 
 	"github.com/osspkg/devtool/internal/build"
 	"github.com/osspkg/devtool/internal/global"
+	"github.com/osspkg/devtool/internal/gosite"
 	"github.com/osspkg/devtool/internal/lic"
 	"github.com/osspkg/devtool/internal/lint"
 	"github.com/osspkg/devtool/internal/setup"
@@ -42,6 +43,7 @@ func main() {
 		tests.Cmd(),
 		build.Cmd(),
 		lic.Cmd(),
+		gosite.Cmd(),
 	)
 
 	app.Exec()

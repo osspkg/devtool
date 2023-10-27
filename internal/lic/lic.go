@@ -63,6 +63,9 @@ func Cmd() console.CommandGetter {
 			goFiles, err := files.DetectByExt(".go")
 			console.FatalIfErr(err, "Get go files")
 			for _, file := range goFiles {
+				if strings.HasSuffix(file, "_easyjson.go") || strings.Contains(file, "/vendor/") {
+					continue
+				}
 				err = files.Rewrite(file, func(s string) string {
 					tmpl := buildTemplate(model)
 					return replaceLic(s, tmpl)
@@ -71,7 +74,7 @@ func Cmd() console.CommandGetter {
 			}
 
 			exec.CommandPack("bash",
-				"go fmt ./...",
+				"gofmt -w -s .",
 			)
 		})
 	})

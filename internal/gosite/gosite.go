@@ -20,9 +20,10 @@ var (
 )
 
 type Data struct {
-	Branch string
-	Repo   string
-	Module string
+	Branch  string
+	Repo    string
+	Root    string
+	Modules []string
 }
 
 func Cmd() console.CommandGetter {
@@ -38,7 +39,7 @@ func Cmd() console.CommandGetter {
 			}
 
 			var configs []string
-			result := make(map[string]Data, 100)
+			result := make(map[string]*Data, 100)
 
 			err := iofile.FileCodec(confpath).Decode(&configs)
 			console.FatalIfErr(err, "Decode config")
@@ -65,6 +66,19 @@ func Cmd() console.CommandGetter {
 				var mods []string
 				mods, err = files.DetectInDir(tempdir, "go.mod")
 				console.FatalIfErr(err, "Detect go.mod files")
+
+				var dataMod *Data
+				if dm, ok := result[config]; ok {
+					dataMod = dm
+				} else {
+					dataMod = &Data{
+						Branch:  HEAD,
+						Repo:    strings.TrimSuffix(config, ".git"),
+						Modules: make([]string, 0, 10),
+					}
+					result[config] = dataMod
+				}
+
 				for _, mod := range mods {
 					b, err = os.ReadFile(mod)
 					console.FatalIfErr(err, "Read go.mod [%s]", mod)
@@ -73,41 +87,53 @@ func Cmd() console.CommandGetter {
 						console.Fatalf("Module not found in %s", mod)
 					}
 					module := _strs[1]
-					result[module] = Data{
-						Branch: HEAD,
-						Repo:   strings.TrimSuffix(config, ".git"),
-						Module: module,
+					dataMod.Modules = append(dataMod.Modules, module)
+				}
+				for i, module := range dataMod.Modules {
+					if i == 0 {
+						dataMod.Root = module
+						continue
 					}
+					if len(dataMod.Root) > len(module) {
+						dataMod.Root = module
+					}
+				}
+
+				if len(dataMod.Modules) == 0 {
+					delete(result, config)
 				}
 			}
 
 			index := make(map[string][]string)
 			for _, data := range result {
 				var u *url.URL
-				u, err = url.Parse("http://" + data.Module)
-				console.FatalIfErr(err, "Decode module url [%s]", data.Module)
+				u, err = url.Parse("http://" + data.Root)
+				console.FatalIfErr(err, "Decode module url [%s]", data.Root)
 				domain := u.Host
-				err = os.MkdirAll(data.Module, 0755)
-				console.FatalIfErr(err, "Create site dir [%s]", data.Module)
 				if _, ok := index[domain]; !ok {
 					index[domain] = make([]string, 0, 10)
 				}
-				index[domain] = append(index[domain], data.Module)
 
-				tmpl := strings.ReplaceAll(htmlPageTemplate, "{%module%}", data.Module)
-				tmpl = strings.ReplaceAll(tmpl, "{%repo%}", data.Repo)
-				tmpl = strings.ReplaceAll(tmpl, "{%head%}", data.Branch)
+				for _, mod := range data.Modules {
+					err = os.MkdirAll(mod, 0755)
+					console.FatalIfErr(err, "Create site dir [%s]", mod)
+					index[domain] = append(index[domain], mod)
 
-				err = os.WriteFile(data.Module+"/index.html", []byte(tmpl), 0755)
-				console.FatalIfErr(err, "Write HTML [%s]", data.Module+"/index.html")
+					tmpl := strings.ReplaceAll(htmlPageTemplate, "{%module%}", mod)
+					tmpl = strings.ReplaceAll(tmpl, "{%root%}", data.Root)
+					tmpl = strings.ReplaceAll(tmpl, "{%repo%}", data.Repo)
+					tmpl = strings.ReplaceAll(tmpl, "{%head%}", data.Branch)
+
+					err = os.WriteFile(mod+"/index.html", []byte(tmpl), 0755)
+					console.FatalIfErr(err, "Write HTML [%s]", mod+"/index.html")
+				}
 			}
-
 			for domain, links := range index {
 				linksHtml := ""
 				for _, link := range links {
 					linkName := strings.TrimPrefix(link, domain)
 					linkName = strings.Trim(linkName, "/")
-					linksHtml += "<li><a href=\"//" + link + "\">" + linkName + "</a></li>"
+					linksHtml += "\n<li><a href=\"//" + link + "\">" + linkName + "</a></li>"
 				}
 
 				tmpl := strings.ReplaceAll(htmlIndexPage, "{%domain%}", domain)
@@ -130,8 +156,8 @@ const (
     <title>{%module%}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, height=device-height, minimum-scale=1.0, initial-scale=1.0">
-    <meta name="go-import" content="{%module%} git {%repo%}">
-    <meta name="go-source" content="{%module%} {%repo%} {%repo%}/tree/{%head%}{/dir} {%repo%}/tree/{%head%}{/dir}/{file}#L{line}">
+    <meta name="go-import" content="{%root%} git {%repo%}">
+    <meta name="go-source" content="{%root%} {%repo%} {%repo%}/tree/{%head%}{/dir} {%repo%}/tree/{%head%}{/dir}/{file}#L{line}">
 </head>
 
 <body>
@@ -147,6 +173,7 @@ const (
         <b>Install command:</b>
         <pre>go get {%module%}</pre>
     </div>
+
     <div>
         <b>Import in source code:</b>
         <pre>import "{%module%}"</pre>

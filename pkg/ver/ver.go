@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-var rex = regexp.MustCompile(`^v([0-9]+)\.([0-9]+)\.([0-9]+)`)
+var rex = regexp.MustCompile(`v([0-9]+)\.([0-9]+)\.([0-9]+)$`)
 
 type Ver struct {
 	Major int64

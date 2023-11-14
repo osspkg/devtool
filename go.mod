@@ -3,7 +3,7 @@ module github.com/osspkg/devtool
 go 1.18
 
 require (
-	go.osspkg.com/goppy v0.14.0
+	go.osspkg.com/goppy v0.14.1
 	golang.org/x/mod v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
 )

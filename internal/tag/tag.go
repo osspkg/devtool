@@ -7,12 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/osspkg/devtool/pkg/repo"
-
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/pkg/exec"
 	"github.com/osspkg/devtool/pkg/files"
 	"github.com/osspkg/devtool/pkg/modules"
+	"github.com/osspkg/devtool/pkg/repo"
 	"github.com/osspkg/devtool/pkg/ver"
 	"go.osspkg.com/goppy/sdk/console"
 	"golang.org/x/mod/modfile"
@@ -117,7 +116,7 @@ func Cmd() console.CommandGetter {
 				console.FatalIfErr(err, "Update go.mod file: %s", m.File)
 			}
 
-			console.Infof("--- GIT COMMITED ---")
+			console.Infof("--- GIT COMMITTED ---")
 
 			cmds := make([]string, 0, 50)
 			cmds = append(cmds,

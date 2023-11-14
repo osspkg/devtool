@@ -66,11 +66,28 @@ func CmdLib() console.CommandGetter {
 				console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0755), "create config [%s]", name)
 			}
 
-			exec.CommandPack("bash",
-				"go mod tidy -compat=1.17",
-				"go mod download",
-				"go generate ./...",
-			)
+			cmds := make([]string, 0, 50)
+			if files.Exist(files.CurrentDir() + "/go.work") {
+				cmds = append(cmds, "go work use -r .", "go work sync")
+				mods, err := files.Detect("go.mod")
+				console.FatalIfErr(err, "detects go.mod in workspace")
+				for _, mod := range mods {
+					dir := filepath.Dir(mod)
+					cmds = append(cmds,
+						"cd "+dir+" && go mod tidy",
+						"cd "+dir+" && go mod download",
+						"cd "+dir+" && go generate ./...",
+					)
+				}
+			} else {
+				cmds = append(cmds,
+					"go mod tidy -compat=1.17",
+					"go mod download",
+					"go generate ./...",
+				)
+			}
+
+			exec.CommandPack("bash", cmds...)
 		})
 	})
 }

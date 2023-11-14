@@ -6,8 +6,11 @@
 package lint
 
 import (
+	"path/filepath"
+
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/pkg/exec"
+	"github.com/osspkg/devtool/pkg/files"
 	"go.osspkg.com/goppy/sdk/console"
 )
 
@@ -18,10 +21,25 @@ func Cmd() console.CommandGetter {
 			global.SetupEnv()
 			console.Infof("--- LINT ---")
 
-			exec.CommandPack("bash",
-				"golangci-lint --version",
-				"golangci-lint -v run ./...",
-			)
+			cmds := make([]string, 0, 50)
+			cmds = append(cmds, "golangci-lint --version")
+			if files.Exist(files.CurrentDir() + "/go.work") {
+				cmds = append(cmds, "go work use -r .", "go work sync")
+				mods, err := files.Detect("go.mod")
+				console.FatalIfErr(err, "detects go.mod in workspace")
+				for _, mod := range mods {
+					dir := filepath.Dir(mod)
+					cmds = append(cmds,
+						"cd "+dir+" && golangci-lint -v run ./...",
+					)
+				}
+			} else {
+				cmds = append(cmds,
+					"golangci-lint -v run ./...",
+				)
+			}
+
+			exec.CommandPack("bash", cmds...)
 		})
 	})
 }

@@ -8,6 +8,8 @@ package main
 import (
 	"os"
 
+	"github.com/osspkg/devtool/internal/tag"
+
 	"github.com/osspkg/devtool/internal/build"
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/internal/gosite"
@@ -44,6 +46,7 @@ func main() {
 		build.Cmd(),
 		lic.Cmd(),
 		gosite.Cmd(),
+		tag.Cmd(),
 	)
 
 	app.Exec()

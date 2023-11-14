@@ -57,7 +57,7 @@ func Cmd() console.CommandGetter {
 				if len(m.Prefix) > 0 {
 					m.Prefix += "/"
 				}
-				b, err = exec.SingleCmd(context.TODO(), "bash", "git tag -l "+m.Prefix+"v*")
+				b, err = exec.SingleCmd(context.TODO(), "bash", "git tag -l \""+m.Prefix+"v*\"")
 				console.FatalIfErr(err, "Get tags for: %s", m.Name)
 				m.Version = ver.Max(strings.Split(string(b), "\n")...)
 			}
@@ -129,6 +129,7 @@ func Cmd() console.CommandGetter {
 				}
 				cmds = append(cmds, "git tag "+m.Prefix+m.Version.String())
 			}
+			cmds = append(cmds, "git push --tags")
 			exec.CommandPack("bash", cmds...)
 		})
 	})

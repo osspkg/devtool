@@ -5,11 +5,13 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/pkg/exec"
 	"github.com/osspkg/devtool/pkg/files"
+	"github.com/osspkg/devtool/pkg/modules"
 	"go.osspkg.com/goppy/sdk/console"
 	"go.osspkg.com/goppy/sdk/iofile"
 )
@@ -63,8 +65,8 @@ func Cmd() console.CommandGetter {
 				console.FatalIfErr(err, "Clone remote HEAD")
 				os.RemoveAll(tempdir + "/.git") //nolint: errcheck
 
-				var mods []string
-				mods, err = files.DetectInDir(tempdir, "go.mod")
+				var mods map[string]*modules.Mod
+				mods, err = modules.Detect(tempdir)
 				console.FatalIfErr(err, "Detect go.mod files")
 
 				var dataMod *Data
@@ -80,11 +82,11 @@ func Cmd() console.CommandGetter {
 				}
 
 				for _, mod := range mods {
-					b, err = os.ReadFile(mod)
-					console.FatalIfErr(err, "Read go.mod [%s]", mod)
+					b, err = os.ReadFile(mod.File)
+					console.FatalIfErr(err, "Read go.mod [%s]", mod.File)
 					_strs = rexMOD.FindStringSubmatch(string(b))
 					if len(_strs) != 2 {
-						console.Fatalf("Module not found in %s", mod)
+						console.Fatalf("Module not found in %s", mod.File)
 					}
 					module := _strs[1]
 					dataMod.Modules = append(dataMod.Modules, module)
@@ -114,6 +116,7 @@ func Cmd() console.CommandGetter {
 					index[domain] = make([]string, 0, 10)
 				}
 
+				sort.Strings(data.Modules)
 				for _, mod := range data.Modules {
 					err = os.MkdirAll(mod, 0755)
 					console.FatalIfErr(err, "Create site dir [%s]", mod)

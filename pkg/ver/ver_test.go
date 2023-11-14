@@ -22,6 +22,16 @@ func TestUnit_Parce(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Case2",
+			args: "app/v1.1000.1231",
+			want: &Ver{
+				Major: 1,
+				Minor: 1000,
+				Patch: 1231,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

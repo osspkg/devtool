@@ -13,6 +13,7 @@ import (
 	"github.com/osspkg/devtool/pkg/modules"
 	"github.com/osspkg/devtool/pkg/repo"
 	"github.com/osspkg/devtool/pkg/ver"
+	"go.osspkg.com/algorithms/graph/kahn"
 	"go.osspkg.com/goppy/sdk/console"
 	"golang.org/x/mod/modfile"
 )
@@ -70,11 +71,26 @@ func Cmd() console.CommandGetter {
 			console.FatalIfErr(err, "Detect changed files")
 			changedFiles := strings.Split(string(b), "\n")
 			for _, file := range changedFiles {
+				if len(file) == 0 {
+					continue
+				}
 				dir := filepath.Dir(file)
-				currmod, err = modules.Read(dir + "/go.mod")
+				isRoot := dir == "."
+				for {
+					currmod, err = modules.Read(dir + "/go.mod")
+					if err != nil && !isRoot && strings.Contains(err.Error(), "no such file") {
+						dir = filepath.Dir(dir)
+						if dir != "." {
+							continue
+						}
+						break
+					}
+					break
+				}
 				if err != nil {
 					continue
 				}
+
 				for _, m := range allMods {
 					if m.Name == currmod.Name && !m.Changed {
 						m.Changed = true
@@ -89,7 +105,26 @@ func Cmd() console.CommandGetter {
 
 			console.Infof("--- UPDATE MODULES ---")
 
+			graph := kahn.New()
 			for _, m := range allMods {
+				_, err = os.Stat(m.File)
+				console.FatalIfErr(err, "Get info go.mod file: %s", m.File)
+				b, err = os.ReadFile(m.File)
+				console.FatalIfErr(err, "Read go.mod file: %s", m.File)
+				_, err = modfile.Parse(m.File, b, func(path, version string) (string, error) {
+					if _, ok := allMods[path]; ok {
+						console.FatalIfErr(graph.Add(path, m.Name), "Create graph from: %s", m.File)
+					}
+					return version, nil
+				})
+				console.FatalIfErr(err, "Parse go.mod file: %s", m.File)
+			}
+			console.FatalIfErr(graph.Build(), "Build graph")
+			for _, s := range graph.Result() {
+				m, ok := allMods[s]
+				if !ok {
+					continue
+				}
 				fmt.Println(">", m.Name)
 				fi, err = os.Stat(m.File)
 				console.FatalIfErr(err, "Get info go.mod file: %s", m.File)
@@ -109,7 +144,7 @@ func Cmd() console.CommandGetter {
 					}
 					return version, nil
 				})
-				console.FatalIfErr(err, "Parce go.mod file: %s", m.File)
+				console.FatalIfErr(err, "Parse go.mod file: %s", m.File)
 				b, err = f.Format()
 				console.FatalIfErr(err, "Format go.mod file: %s", m.File)
 				err = os.WriteFile(m.File, b, fi.Mode())
@@ -129,7 +164,7 @@ func Cmd() console.CommandGetter {
 				}
 				cmds = append(cmds, "git tag "+m.Prefix+m.Version.String())
 			}
-			cmds = append(cmds, "git push --tags")
+			cmds = append(cmds, "git push", "git push --tags")
 			exec.CommandPack("bash", cmds...)
 		})
 	})

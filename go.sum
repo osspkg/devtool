@@ -7,8 +7,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
-go.osspkg.com/algorithms v1.3.0 h1:rrKO440aNTofYJwGnOVsW00w0VRtZtu+BQrgXMXw7j4=
-go.osspkg.com/algorithms v1.3.0/go.mod h1:J2SXxHdqBK9ALGYJomA9XGvTOhIwMK0fvVw+KusYyoo=
+go.osspkg.com/algorithms v1.3.1 h1:Weh0Z4dMzHFRJTfMva/mU6Uk95wSRGwt1Saj2sfz3Wc=
+go.osspkg.com/algorithms v1.3.1/go.mod h1:kj+oVK7UDQlXMKleMTYzbEEpUAXC2tzRBtki7F5EbXc=
 go.osspkg.com/goppy v0.14.0 h1:7YoNaSA+XIAy+lbIMEdmMIXH9Em+keNRMVvqP4+4jiE=
 go.osspkg.com/goppy v0.14.0/go.mod h1:NAWYk3WylEMTTcEgFiFEQsL69T/ox614gpuzlWyxlzg=
 golang.org/x/mod v0.14.0 h1:dGoOF9QVLYng8IHTm7BAyWqCqSheQ5pYWGhzW00YJr0=

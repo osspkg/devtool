@@ -96,6 +96,7 @@ func Cmd() console.CommandGetter {
 						m.Changed = true
 						if minor {
 							m.Version.Minor++
+							m.Version.Patch = 0
 						} else {
 							m.Version.Patch++
 						}
@@ -135,6 +136,7 @@ func Cmd() console.CommandGetter {
 						if !m.Changed {
 							if minor {
 								m.Version.Minor++
+								m.Version.Patch = 0
 							} else {
 								m.Version.Patch++
 							}

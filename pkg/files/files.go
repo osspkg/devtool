@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2023 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
+ *  Copyright (c) 2022-2024 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
  *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
  */
 
@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.osspkg.com/goppy/sdk/console"
+	"go.osspkg.com/goppy/console"
 	"gopkg.in/yaml.v3"
 )
 
@@ -58,7 +58,7 @@ func DetectByExt(ext string) ([]string, error) {
 
 func Rewrite(filename string, cb func(string) string) error {
 	if !Exist(filename) {
-		if err := os.WriteFile(filename, []byte(""), 0755); err != nil {
+		if err := os.WriteFile(filename, []byte(""), 0664); err != nil {
 			return err
 		}
 	}
@@ -69,7 +69,7 @@ func Rewrite(filename string, cb func(string) string) error {
 
 	b = []byte(cb(string(b)))
 
-	return os.WriteFile(filename, b, 0755)
+	return os.WriteFile(filename, b, 0664)
 }
 
 func Exist(filename string) bool {
@@ -96,5 +96,5 @@ func YamlWrite(filename string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filename, b, 0755)
+	return os.WriteFile(filename, b, 0664)
 }

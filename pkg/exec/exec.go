@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2023 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
+ *  Copyright (c) 2022-2024 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
  *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
  */
 
@@ -13,8 +13,8 @@ import (
 	"sync"
 
 	"github.com/osspkg/devtool/pkg/files"
-	"go.osspkg.com/goppy/sdk/console"
-	"go.osspkg.com/goppy/sdk/syscall"
+	"go.osspkg.com/goppy/console"
+	"go.osspkg.com/goppy/syscall"
 )
 
 func CommandPack(shell string, command ...string) {
@@ -57,10 +57,10 @@ func runCmd(ctx context.Context, shell string, command string) error {
 
 	stdout, err := cmd.StdoutPipe()
 	console.FatalIfErr(err, "stdout init")
-	defer stdout.Close() //nolint: errcheck
+	defer stdout.Close() // nolint: errcheck
 	stderr, err := cmd.StderrPipe()
 	console.FatalIfErr(err, "stderr init")
-	defer stderr.Close() //nolint: errcheck
+	defer stderr.Close() // nolint: errcheck
 
 	console.FatalIfErr(cmd.Start(), "start command")
 

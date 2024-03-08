@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2023 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
+ *  Copyright (c) 2022-2024 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
  *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
  */
 
@@ -16,7 +16,7 @@ import (
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/pkg/exec"
 	"github.com/osspkg/devtool/pkg/files"
-	"go.osspkg.com/goppy/sdk/console"
+	"go.osspkg.com/goppy/console"
 )
 
 const (
@@ -118,7 +118,7 @@ func buildLic(m *Lic) error {
 	}
 	lic = strings.ReplaceAll(lic, "{%YEARS%}", m.Years)
 	lic = strings.ReplaceAll(lic, "{%AUTHOR%}", m.Author)
-	return os.WriteFile(m.LicFile, []byte(lic), 0755)
+	return os.WriteFile(m.LicFile, []byte(lic), 0664)
 }
 
 var lics = map[string]string{

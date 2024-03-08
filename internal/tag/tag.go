@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2022-2024 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
+ *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
+ */
+
 package tag
 
 import (
@@ -14,7 +19,7 @@ import (
 	"github.com/osspkg/devtool/pkg/repo"
 	"github.com/osspkg/devtool/pkg/ver"
 	"go.osspkg.com/algorithms/graph/kahn"
-	"go.osspkg.com/goppy/sdk/console"
+	"go.osspkg.com/goppy/console"
 	"golang.org/x/mod/modfile"
 )
 
@@ -114,7 +119,7 @@ func Cmd() console.CommandGetter {
 				console.FatalIfErr(err, "Read go.mod file: %s", m.File)
 				_, err = modfile.Parse(m.File, b, func(path, version string) (string, error) {
 					if _, ok := allMods[path]; ok {
-						console.FatalIfErr(graph.Add(path, m.Name), "Create graph from: %s", m.File)
+						graph.Add(path, m.Name)
 					}
 					return version, nil
 				})

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2022-2023 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
+ *  Copyright (c) 2022-2024 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
  *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
  */
 
@@ -13,7 +13,7 @@ import (
 	"github.com/osspkg/devtool/internal/global"
 	"github.com/osspkg/devtool/pkg/exec"
 	"github.com/osspkg/devtool/pkg/files"
-	"go.osspkg.com/goppy/sdk/console"
+	"go.osspkg.com/goppy/console"
 )
 
 func CmdLib() console.CommandGetter {
@@ -27,7 +27,7 @@ func CmdLib() console.CommandGetter {
 			console.Infof("--- SETUP ENV ---")
 
 			toolDir := global.GetToolsDir()
-			console.FatalIfErr(os.MkdirAll(toolDir, 0755), "create tools dir")
+			console.FatalIfErr(os.MkdirAll(toolDir, 0744), "create tools dir")
 
 			console.Infof("update .gitignore")
 			console.FatalIfErr(files.Rewrite(files.CurrentDir()+"/.gitignore", func(s string) string {
@@ -61,9 +61,9 @@ func CmdLib() console.CommandGetter {
 					continue
 				}
 				if strings.Contains(name, "/") {
-					console.FatalIfErr(os.MkdirAll(files.CurrentDir()+"/"+filepath.Dir(name), 0755), "create dir for [%s]", name)
+					console.FatalIfErr(os.MkdirAll(files.CurrentDir()+"/"+filepath.Dir(name), 0744), "create dir for [%s]", name)
 				}
-				console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0755), "create config [%s]", name)
+				console.FatalIfErr(os.WriteFile(files.CurrentDir()+"/"+name, []byte(config), 0664), "create config [%s]", name)
 			}
 
 			cmds := make([]string, 0, 50)
@@ -104,8 +104,8 @@ func CmdApp() console.CommandGetter {
 
 			initDir, scriptsDir := global.GetInitDir(), global.GetScriptsDir()
 
-			console.FatalIfErr(os.MkdirAll(initDir, 0755), "create init dir")
-			console.FatalIfErr(os.MkdirAll(scriptsDir, 0755), "create scripts dir")
+			console.FatalIfErr(os.MkdirAll(initDir, 0744), "create init dir")
+			console.FatalIfErr(os.MkdirAll(scriptsDir, 0744), "create scripts dir")
 
 			console.Infof("update .gitignore")
 			console.FatalIfErr(files.Rewrite(files.CurrentDir()+"/.gitignore", func(s string) string {

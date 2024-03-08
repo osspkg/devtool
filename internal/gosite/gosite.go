@@ -1,3 +1,8 @@
+/*
+ *  Copyright (c) 2022-2024 Mikhail Knyazhev <markus621@yandex.ru>. All rights reserved.
+ *  Use of this source code is governed by a BSD 3-Clause license that can be found in the LICENSE file.
+ */
+
 package gosite
 
 import (
@@ -12,8 +17,8 @@ import (
 	"github.com/osspkg/devtool/pkg/exec"
 	"github.com/osspkg/devtool/pkg/files"
 	"github.com/osspkg/devtool/pkg/modules"
-	"go.osspkg.com/goppy/sdk/console"
-	"go.osspkg.com/goppy/sdk/iofile"
+	"go.osspkg.com/goppy/console"
+	"go.osspkg.com/goppy/iofile"
 )
 
 var (
@@ -47,10 +52,10 @@ func Cmd() console.CommandGetter {
 			console.FatalIfErr(err, "Decode config")
 
 			tempdir := files.CurrentDir() + "/.tmp"
-			defer os.RemoveAll(tempdir) //nolint: errcheck
+			defer os.RemoveAll(tempdir) // nolint: errcheck
 			for _, config := range configs {
-				os.RemoveAll(tempdir) //nolint: errcheck
-				console.FatalIfErr(os.MkdirAll(tempdir, 0755), "Create temp dir")
+				os.RemoveAll(tempdir) // nolint: errcheck
+				console.FatalIfErr(os.MkdirAll(tempdir, 0744), "Create temp dir")
 
 				var b []byte
 				b, err = exec.SingleCmd(context.TODO(), "bash", "git ls-remote --symref "+config+" HEAD")
@@ -63,7 +68,7 @@ func Cmd() console.CommandGetter {
 
 				_, err = exec.SingleCmd(context.TODO(), "bash", "git clone --branch "+HEAD+" --single-branch "+config+" .tmp")
 				console.FatalIfErr(err, "Clone remote HEAD")
-				os.RemoveAll(tempdir + "/.git") //nolint: errcheck
+				os.RemoveAll(tempdir + "/.git") // nolint: errcheck
 
 				var mods map[string]*modules.Mod
 				mods, err = modules.Detect(tempdir)
@@ -118,7 +123,7 @@ func Cmd() console.CommandGetter {
 
 				sort.Strings(data.Modules)
 				for _, mod := range data.Modules {
-					err = os.MkdirAll(mod, 0755)
+					err = os.MkdirAll(mod, 0744)
 					console.FatalIfErr(err, "Create site dir [%s]", mod)
 					index[domain] = append(index[domain], mod)
 
@@ -127,7 +132,7 @@ func Cmd() console.CommandGetter {
 					tmpl = strings.ReplaceAll(tmpl, "{%repo%}", data.Repo)
 					tmpl = strings.ReplaceAll(tmpl, "{%head%}", data.Branch)
 
-					err = os.WriteFile(mod+"/index.html", []byte(tmpl), 0755)
+					err = os.WriteFile(mod+"/index.html", []byte(tmpl), 0664)
 					console.FatalIfErr(err, "Write HTML [%s]", mod+"/index.html")
 				}
 			}
@@ -142,7 +147,7 @@ func Cmd() console.CommandGetter {
 				tmpl := strings.ReplaceAll(htmlIndexPage, "{%domain%}", domain)
 				tmpl = strings.ReplaceAll(tmpl, "{%links%}", linksHtml)
 
-				err = os.WriteFile(domain+"/index.html", []byte(tmpl), 0755)
+				err = os.WriteFile(domain+"/index.html", []byte(tmpl), 0664)
 				console.FatalIfErr(err, "Write HTML [%s]", domain+"/index.html")
 			}
 

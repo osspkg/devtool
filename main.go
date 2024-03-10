@@ -23,7 +23,7 @@ import (
 func main() {
 	console.ShowDebug(true)
 
-	app := console.New("devtool", "help devtool")
+	app := console.New("devtool", "Development Tool")
 
 	app.RootCommand(console.NewCommand(func(setter console.CommandSetter) {
 		setter.ExecFunc(func(_ []string) {

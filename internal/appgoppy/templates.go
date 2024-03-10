@@ -26,19 +26,19 @@ func main() {
 	app.AppName("{{.app_name}}")
 	app.AppVersion(Version)
 	app.Plugins(
-		{{if .mod_metrics}}metrics.WithMetrics(),{{end}}
+		{{if .mod_metrics}}metrics.WithServer(),{{end}}
 		{{if .mod_geoip}}geoip.WithMaxMindGeoIP(),{{end}}
 		{{if .mod_oauth}}auth.WithOAuth(),{{end}}
 		{{if .mod_auth_jwt}}auth.WithJWT(),{{end}}
-		{{if .mod_db_mysql}}ormmysql.WithMySQL(),{{end}}
-		{{if .mod_db_sqlite}}ormsqlite.WithSQLite(),{{end}}
-		{{if .mod_db_postgre}}ormpgsql.WithPostgreSQL(),{{end}}
-		{{if .mod_web_server}}web.WithHTTP(),{{end}}
-		{{if .mod_web_client}}web.WithHTTPClient(),{{end}}
-		{{if .mod_websocket_server}}ws.WithWebsocketServer(),{{end}}
-		{{if .mod_websocket_client}}ws.WithWebsocketClient(),{{end}}
-		{{if .mod_dns_server}}xdns.WithDNSServer(),{{end}}
-		{{if .mod_dns_client}}xdns.WithDNSClient(),{{end}}
+		{{if .mod_db_mysql}}ormmysql.WithClient(),{{end}}
+		{{if .mod_db_sqlite}}ormsqlite.WithClient(),{{end}}
+		{{if .mod_db_postgre}}ormpgsql.WithClient(),{{end}}
+		{{if .mod_web_server}}web.WithServer(),{{end}}
+		{{if .mod_web_client}}web.WithClient(),{{end}}
+		{{if .mod_websocket_server}}ws.WithServer(),{{end}}
+		{{if .mod_websocket_client}}ws.WithClient(),{{end}}
+		{{if .mod_dns_server}}xdns.WithServer(),{{end}}
+		{{if .mod_dns_client}}xdns.WithClient(),{{end}}
 		{{if .mod_unixsocket_server}}unixsocket.WithServer(),{{end}}
 		{{if .mod_unixsocket_client}}unixsocket.WithClient(),{{end}}
 	)
